@@ -8,7 +8,7 @@ def printTracks(fileName):
         print('Track {}: {}'.format(i, track.name))
 
 
-def readMidi(fileName, trackNumbers = [1], baseNote = 0, noteRange = 5, noteLim = 30):
+def readMidi(fileName, trackNumbers = [1], baseNote = 0, noteRange = 5, noteLim = 30,offset = 0):
     '''This will read a midi file and return an array of notes in the given range (x size )
     and up to the given length  (y size). The trackNumbers dictates which tracks to accept notes from
     it will also return an array of times dictating how long to wait before droping the current set.'''
@@ -19,9 +19,13 @@ def readMidi(fileName, trackNumbers = [1], baseNote = 0, noteRange = 5, noteLim 
     notesList = []
     elapsedTime = 0
     for msg in mid: # run through all messages
+        print(msg)
         if msg.time != 0: # if there is a time associated with the message add it to time tracker
             elapsedTime += msg.time
-            if max(currentNotes): #if there is a note played, index current states and move on to next row
+            if max(currentNotes) and offset:
+                offset -= 1
+                currentNotes = emptyNotes.copy()
+            elif max(currentNotes): #if there is a note played, index current states and move on to next row
                 timeTracker.append(elapsedTime)
                 notesList.append(currentNotes)
                 currentNotes = emptyNotes.copy()
