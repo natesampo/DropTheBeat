@@ -8,7 +8,7 @@ def printTracks(fileName):
         print('Track {}: {}'.format(i, track.name))
 
 
-def readMidi(fileName, trackNumbers = [1], baseNote = 0, noteRange = 5, noteLim = 30,offset = 0):
+def readMidi(fileName, trackNumbers = [1], baseNote = 0, noteRange = 5, noteLim = 30,offset = 0, dictN =None):
     '''This will read a midi file and return an array of notes in the given range (x size )
     and up to the given length  (y size). The trackNumbers dictates which tracks to accept notes from
     it will also return an array of times dictating how long to wait before droping the current set.'''
@@ -31,9 +31,14 @@ def readMidi(fileName, trackNumbers = [1], baseNote = 0, noteRange = 5, noteLim 
                 currentNotes = emptyNotes.copy()
                 elapsedTime = 0
 
-        if (not msg.is_meta) and  msg.channel in trackNumbers and msg.type == 'note_on' and baseNote <= msg.note < baseNote + noteRange:
+        if (not msg.is_meta) and  msg.channel in trackNumbers and msg.type == 'note_on':
+
             #if its a valid message and track in the key range, write 1 in the corresponding index.
-            currentNotes[msg.note - baseNote] = 1
+            if dictN and msg.note in dictN.keys():
+                currentNotes[dictN[msg.note]] = 1
+            elif not dictN and baseNote <= msg.note < baseNote + noteRange:
+                currentNotes[msg.note - baseNote] = 1
+
         if len(timeTracker) > noteLim:#if we get too long, break
             break
     return timeTracker, np.array(notesList)
