@@ -8,7 +8,7 @@ def printTracks(fileName):
         print('Track {}: {}'.format(i, track.name))
 
 
-def readMidi(fileName, trackNumbers = [1], baseNote = 0, noteRange = 5, noteLim = 30,offset = 0, dictN =None):
+def readMidi(fileName, trackNumbers = [1], baseNote = 0, noteRange = 5, noteLim = 30,offset = 0, dictN =None,space= False):
     '''This will read a midi file and return an array of notes in the given range (x size )
     and up to the given length  (y size). The trackNumbers dictates which tracks to accept notes from
     it will also return an array of times dictating how long to wait before droping the current set.'''

@@ -10,7 +10,7 @@ svgname = 'testHoney.svg'#file to load
 # mm = 3.543 #simple conversions between px and other formats
 # cm = 35.43
 # inch = 90
-sw = str(0.1) #width of drawn lines
+sw = str(0.1)#width of drawn lines
 sysMult = 1 # chosen multiplier for all inputs
 # sysDict = {3.543:'mm',35.43:'cm',90:'inches'}
 print(sysMult)
@@ -26,11 +26,13 @@ class svgCut:
         self.holeRadius = holeRadius
         self.holeSpacex = holeSpace[0] #x distance between holes.. should be at least radius * 2
         self.holeSpacey = holeSpace[1]
-        self.borderSpace = borderSpace #extra space on the sides where no holes will be drawn
+        self.borderSpacex = borderSpace[0]
+        self.borderSpacey =  borderSpace[1]#extra space on the sides where no holes will be drawn
+        self.borderSpaceEnd = borderSpace[2]
         if honeyComb:
-            self.pagex = self.borderSpace * 2 + (self.numHoles-.5) * self.holeSpacex + 2 * self.holeRadius
+            self.pagex = self.borderSpacex * 2 + (self.numHoles-.5) * self.holeSpacex + 2 * self.holeRadius
         else:
-            self.pagex = self.borderSpace * 2 + (self.numHoles - 1) * self.holeSpacex + self.holeRadius * 2 #from what we are already given we can calculate width of page
+            self.pagex = self.borderSpacex * 2 + (self.numHoles - 1) * self.holeSpacex + self.holeRadius * 2 #from what we are already given we can calculate width of page
 
     def drawRectangle(self,dwg,origin = (0,0), end = None):
         '''This will draw a rectangle around the border so it can be properly cut'''
@@ -47,16 +49,16 @@ class svgCut:
 
         if honeyComb:
             if point[1] % 2:
-                centerx = self.borderSpace + self.holeSpacex * (point[0]+.5) + self.holeRadius
+                centerx = self.borderSpacex + self.holeSpacex * (point[0]+.5) + self.holeRadius
                 centery = self.holeSpacey * (point[1]//2+.5) + self.holeRadius
 
             else:
-                centerx = self.borderSpace + self.holeSpacex * (point[0]) + self.holeRadius
+                centerx = self.borderSpacex + self.holeSpacex * (point[0]) + self.holeRadius
                 centery = self.holeSpacey * (point[1]//2) + self.holeRadius
         else:
-            centerx = self.borderSpace + self.holeSpacex * point[0] + self.holeRadius
+            centerx = self.borderSpacex + self.holeSpacex * point[0] + self.holeRadius
             centery = self.holeSpacey * point[1] + self.holeRadius
-        dwg.add(dwg.circle(center=(convertIn(centerx),convertIn(centery)),
+        dwg.add(dwg.circle(center=(convertIn(centerx),convertIn(self.borderSpacey + centery)),
                         r=convertIn(self.holeRadius),fill_opacity = 0.0,stroke=strokeColor,stroke_width=sw))
 
     def drawHoles(self,holeArray):
@@ -64,7 +66,10 @@ class svgCut:
         if(len(holeArray[0]) != self.numHoles):#check to make sure size of  array is correct
             print('DIMENSION MISMATCH')
             return 0
-        self.pagey = (len(holeArray) + 1) * self.holeSpacey #calculate pag length
+        if honeyComb:
+            self.pagey = (len(holeArray)//2 + 1) * self.holeSpacey +  self.borderSpacey + self.borderSpaceEnd
+        else:
+            self.pagey = (len(holeArray) + 1) * self.holeSpacey  +  self.borderSpacey + self.borderSpaceEnd#calculate pag length
         xString = str(self.pagex) + 'in' #string stuff
         yString = str(self.pagey) + 'in'
         print('Width in inches: ',str(self.pagex))
@@ -81,8 +86,11 @@ class svgCut:
 
 
 if __name__ == "__main__":
-    dictN = {66:0 ,68:1,69:2 ,71:3, 73:4}
-    cutObj = svgCut(numHoles = 5,holeRadius = .265/2,holeSpace = [2*(.265 + 0.0751011),.265], borderSpace= .251)
-    convertMidi.printTracks('doctor.mid')
-    times, cutArr = convertMidi.readMidi('doctor.mid', trackNumbers = [0,1], baseNote = 64, noteRange = 5, noteLim = 20,offset = 0,dictN =dictN)
+    svgname = 'OdeToJoy.svg'
+    dictN = {60:0 ,62:1,64:2 ,65:3, 67:4}
+    cutObj = svgCut(numHoles = 5,holeRadius = .265/2,holeSpace = [2*(.265 + 0.0751011),.265], borderSpace= [.251,5,2])
+    convertMidi.printTracks('OdeToJoy.mid')
+    times, cutArr = convertMidi.readMidi('OdeToJoy.mid', trackNumbers = [0,1], baseNote = 64, noteRange = 5, noteLim = 100,offset = 0,dictN =dictN,space = True)
     cutObj.drawHoles(cutArr)
+    svgname = 'pushStick.svg'
+    cutObj.drawHoles([[0,0,0,0,0]])
