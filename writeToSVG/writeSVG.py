@@ -14,7 +14,7 @@ sw = str(0.1)#width of drawn lines
 sysMult = 1 # chosen multiplier for all inputs
 # sysDict = {3.543:'mm',35.43:'cm',90:'inches'}
 print(sysMult)
-honeyComb = 1
+honeyComb = 0
 def convertIn(unit):
     return str(unit)
 
@@ -82,15 +82,36 @@ class svgCut:
         self.drawRectangle(dwg)
         dwg.save()
 
+def addHoles(timeArr, cutArr, minTime = 0):
+
+    unit = min(timeArr)
+    timeArr[0] = 0
+    if unit >= minTime:
+        minTime = unit
+    plus = 0
+    empty = [0] * len(cutArr[0])
+    for i,v in enumerate(timeArr):
+        extra = round(v/minTime)-1
+        for j in range(extra):
+            print('Done')
+
+            cutArr = np.insert(cutArr,i+ plus, empty, axis = 0)
+            plus += 1
+    print(cutArr)
+    return cutArr
+
 
 
 
 if __name__ == "__main__":
-    svgname = 'OdeToJoy.svg'
-    dictN = {60:0 ,62:1,64:2 ,65:3, 67:4}
-    cutObj = svgCut(numHoles = 5,holeRadius = .265/2,holeSpace = [2*(.265 + 0.0751011),.265], borderSpace= [.251,5,2])
-    convertMidi.printTracks('OdeToJoy.mid')
-    times, cutArr = convertMidi.readMidi('OdeToJoy.mid', trackNumbers = [0,1], baseNote = 64, noteRange = 5, noteLim = 100,offset = 0,dictN =dictN,space = True)
+    print("WHAT")
+    svgname = 'doctor.svg'
+    # dictN = {60:0 ,62:1,64:2 ,65:3, 67:4}
+    cutObj = svgCut(numHoles = 30,holeRadius = .265/2,holeSpace = [2*(.265 + 0.0751011),.265], borderSpace= [.251,1,1])
+    convertMidi.printTracks('doctor.mid')
+    times, cutArr = convertMidi.readMidi('doctor.mid', trackNumbers = list(range(0,14)), baseNote = 40, noteRange = 30, noteLim = 60,offset = 0)
+    print(times)
+    cutArr = addHoles(times, cutArr)
     cutObj.drawHoles(cutArr)
-    svgname = 'pushStick.svg'
-    cutObj.drawHoles([[0,0,0,0,0]])
+    # svgname = 'pushStick.svg'
+    # cutObj.drawHoles([[0,0,0,0,0]])

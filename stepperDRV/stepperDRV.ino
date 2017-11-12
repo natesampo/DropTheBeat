@@ -8,7 +8,7 @@ void setup()
 void loop()
 {
   digitalWrite(4, HIGH);       // sets the digital pin 13 on
-  delay(5);                  // waits for a second
+  delay(13);                  // waits for a second
   digitalWrite(4, LOW);        // sets the digital pin 13 off
-  delay(5);                  // waits for a second
+  delay(13);                  // waits for a second
 }
