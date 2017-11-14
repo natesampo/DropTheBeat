@@ -3,8 +3,6 @@ from svgwrite import mm, cm
 import numpy as np
 import convertMidi
 
-
-
 strokeColor = "red" #
 svgname = 'testHoney.svg'#file to load
 # mm = 3.543 #simple conversions between px and other formats
@@ -21,6 +19,8 @@ def convertIn(unit):
 class svgCut:
     '''This is the object that controls most of the operations of writing to the
     svg'''
+    maxTime=None
+    minTime=None
     def __init__(self,numHoles,holeRadius,holeSpace,borderSpace):
         self.numHoles = numHoles
         self.holeRadius = holeRadius
@@ -42,6 +42,51 @@ class svgCut:
         for line in lines:
             dwg.add(dwg.line(start = (convertIn(line[0][0]),convertIn(line[0][1])),end = (convertIn(line[1][0]),convertIn(line[1][1])),stroke=strokeColor,stroke_width=sw))
         pass
+    def setSpeeds(self,low, fast):
+        #in inches per second
+        if honeyComb:
+            vSpace = self.holeSpacey / 2
+        else:
+            vSpace = self.holeSpacey
+
+        self.maxTime = convertToBeats(vSpace / slow)
+        self.minTime = convertToBeats(vSpace / fast)
+
+
+    def getProportion(self, time):
+        return (time - self.minTime)  / (self.maxTime - self.minTime)
+
+
+    def encodeTimes(self,timeArr):
+        lengthArr = []
+        if honeyComb:
+            vSpace = self.holeSpacey / 2
+        else:
+            vSpace = self.holeSpacey
+
+        for i in timeArr:
+            if i > self.maxTime:
+                print("TOO LONG")
+                i = self.maxTime
+            elif i < self.minTime:
+                print("TOO SHORT")
+                i = self.minTime
+            lengthArr.append(self.getProportion(i) * vSpace)
+
+        return lengthArr
+
+    def drawTimes(self,lengthArr,width = 20,topLeft = (100,100)):
+        if honeyComb:
+            vSpace = self.holeSpacey / 2
+        else:
+            vSpace = self.holeSpacey
+
+        for j,v in enumerate(lengthArr):
+            if v and v < vSpace:
+                insert = (topLeft, j * vSpace - v)
+                size = (width, v)
+                dwg.add(dwg.rect(insert=insert,size = size,fill_opacity = 0.0,stroke=strokeColor,stroke_width=sw))
+
 
 
     def drawHole(self, dwg, point):
@@ -50,15 +95,15 @@ class svgCut:
         if honeyComb:
             if point[1] % 2:
                 centerx = self.borderSpacex + self.holeSpacex * (point[0]+.5) + self.holeRadius
-                centery = self.holeSpacey * (point[1]//2+.5) + self.holeRadius
+                centery = self.holeSpacey * (point[1]//2+.5) + self.holeRadius + self.borderSpacey
 
             else:
                 centerx = self.borderSpacex + self.holeSpacex * (point[0]) + self.holeRadius
-                centery = self.holeSpacey * (point[1]//2) + self.holeRadius
+                centery = self.holeSpacey * (point[1]//2) + self.holeRadius + self.borderSpacey
         else:
             centerx = self.borderSpacex + self.holeSpacex * point[0] + self.holeRadius
-            centery = self.holeSpacey * point[1] + self.holeRadius
-        dwg.add(dwg.circle(center=(convertIn(centerx),convertIn(self.borderSpacey + centery)),
+            centery = self.holeSpacey * point[1] + self.holeRadius + self.borderSpacey
+        dwg.add(dwg.circle(center=(convertIn(centerx),convertIn(centery)),
                         r=convertIn(self.holeRadius),fill_opacity = 0.0,stroke=strokeColor,stroke_width=sw))
 
     def drawHoles(self,holeArray):
@@ -88,6 +133,8 @@ def addHoles(timeArr, cutArr, minTime = 0):
     timeArr[0] = 0
     if unit >= minTime:
         minTime = unit
+    if self.minTime and minTime < self.minTime:
+        raise NameError('NOT FAST ENOUGH')
     plus = 0
     empty = [0] * len(cutArr[0])
     for i,v in enumerate(timeArr):
@@ -100,7 +147,9 @@ def addHoles(timeArr, cutArr, minTime = 0):
     print(cutArr)
     return cutArr
 
-
+def convertToBeats(s):
+    #TODO
+    return s
 
 
 if __name__ == "__main__":
