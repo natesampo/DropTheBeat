@@ -1,23 +1,20 @@
 int wait = 10; 
 #include <AccelStepper.h>
-//AccelStepper Xaxis(1, 11, 10); // pin 3 = step, pin 6 = direction
+AccelStepper sheets(1, 11,10); // pin 3 = step, pin 6 = direction
+AccelStepper wheel(1, 12,9); // pin 3 = step, pin 6 = direction
+
 void setup()
 {
-//  
-  pinMode(11, OUTPUT);
-
-  //Xaxis.setMaxSpeed(50);
-  //Xaxis.setSpeed(20);
-  
+  sheets.setMaxSpeed(400);
+  sheets.setSpeed(320);
+  wheel.setMaxSpeed(100);
+  wheel.setSpeed(25);
    
 }
 
 void loop()
 {
-  //Xaxis.runSpeed();
-  digitalWrite(11,HIGH);
-  delay(100);
-  digitalWrite(11,LOW);
-  delay(100);
+  wheel.runSpeed();
+
 //  
 }

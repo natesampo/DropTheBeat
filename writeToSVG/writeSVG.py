@@ -8,11 +8,11 @@ svgname = 'MountainKing.svg'#file to load
 # mm = 3.543 #simple conversions between px and other formats
 # cm = 35.43
 # inch = 90
-sw = str(0.001)#width of drawn lines
+sw = str(0.1)#width of drawn lines
 sysMult = 1 # chosen multiplier for all inputs
 # sysDict = {3.543:'mm',35.43:'cm',90:'inches'}
 print(sysMult)
-honeyComb = 1
+honeyComb = 0
 def convertIn(unit):
     return str(unit)
 
@@ -30,7 +30,7 @@ class svgCut:
         self.borderSpacey =  borderSpace[1]#extra space on the sides where no holes will be drawn
         self.borderSpaceEnd = borderSpace[2]
         if honeyComb:
-            self.pagex = self.borderSpacex * 2 + (self.numHoles-1) * self.holeSpacex + 2*holeRadius
+            self.pagex = self.borderSpacex * 2 + (self.numHoles-0.5) * self.holeSpacex + 2*holeRadius
         else:
             self.pagex = self.borderSpacex * 2 + (self.numHoles - 1) * self.holeSpacex + self.holeRadius * 2 #from what we are already given we can calculate width of page
 
@@ -133,15 +133,16 @@ class svgCut:
     def addHoles(self, timeArr, cutArr, minTime = 0):
 
         unit = min(timeArr)
-        timeArr[0] = 0
+        # timeArr[0] = 0
         if unit >= minTime:
             minTime = unit
         if self.minTime and minTime < self.minTime:
             raise NameError('NOT FAST ENOUGH')
-        plus = 0
+        plus = 1
         empty = [0] * len(cutArr[0])
         for i,v in enumerate(timeArr):
             extra = round(v/minTime)-1
+            print(extra)
             for j in range(extra):
                 print('Done')
 
@@ -156,11 +157,12 @@ def convertToBeats(s):
 
 
 if __name__ == "__main__":
-    svgname = 'mountain.svg'
+    svgname = 'mega.svg'
     dictN = {64:0, 65:2, 66:4,67:6,68:8,69:10,70:12,71:1,72:3,73:5,74:7,75:9,76:11}
-    cutObj = svgCut(numHoles = 13,holeRadius = .265/2,holeSpace = [2*(.265 + 0.0751011),.265], borderSpace= [0.46905,2.5,2.5])
-    convertMidi.printTracks('MountainKing.mid')
-    times, cutArr = convertMidi.readMidi('MountainKing.mid', trackNumbers = list(range(0,2)), baseNote = 64, noteRange = 13, noteLim = 150,offset = 0,dictN = dictN)
+    cutObj = svgCut(numHoles = 13,holeRadius = .265/2,holeSpace = [2*(.265 + 0.0751011),.265], borderSpace= [0.29899,2.5,2.5])
+    convertMidi.printTracks('megalovania.mid')
+    times, cutArr = convertMidi.readMidi('megalovania.mid', trackNumbers = list(range(0,2)), baseNote = 64, noteRange = 13, noteLim = 105,offset = 0,dictN = dictN)
+    print(times)
     # cutObj.setSpeeds(slow = 0.1,fast = 2)
 
     # print(times)
